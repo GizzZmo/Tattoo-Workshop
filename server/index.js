@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { setupAuthRoutes } from './auth/routes.js';
-import { optionalAuth } from './auth/middleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

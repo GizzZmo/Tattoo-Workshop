@@ -3,12 +3,9 @@
  * Handles user registration, login, and profile management
  */
 
-import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { hashPassword, comparePassword, generateToken, validatePassword } from '../auth/utils.js';
 import { authenticate, authorize } from '../auth/middleware.js';
-
-const router = express.Router();
 
 // Rate limiting helper - simple in-memory implementation
 const loginAttempts = new Map();
