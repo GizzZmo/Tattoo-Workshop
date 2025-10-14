@@ -160,6 +160,8 @@ Planned enhancements include:
 - Multi-language support
 - Custom branding options
 
+For detailed information about each planned feature, priorities, technical considerations, and development phases, see [ROADMAP.md](ROADMAP.md).
+
 ## 🤝 Community
 
 ### Contributing

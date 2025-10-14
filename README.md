@@ -189,6 +189,7 @@ For a complete documentation index and navigation guide, see [DOCUMENTATION.md](
 - [QUICKSTART.md](QUICKSTART.md) - Get started quickly
 - [INSTALLATION.md](INSTALLATION.md) - Detailed installation guide
 - [API.md](API.md) - Complete API documentation
+- [ROADMAP.md](ROADMAP.md) - Detailed product roadmap and planned features
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 - [PROJECT-SUMMARY.md](PROJECT-SUMMARY.md) - Complete project summary
 - [DOCUMENTATION.md](DOCUMENTATION.md) - Documentation index and navigation
@@ -215,6 +216,8 @@ Future enhancements planned:
 - [ ] Advanced reporting and analytics
 - [ ] Integration with payment processors
 - [ ] Booking widget for website integration
+
+For detailed information about each planned feature, including priorities, technical considerations, and benefits, see [ROADMAP.md](ROADMAP.md).
 
 ## Acknowledgments 🙏
 

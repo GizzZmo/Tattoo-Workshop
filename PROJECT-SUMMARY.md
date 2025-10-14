@@ -192,10 +192,11 @@ Tattoo-Workshop/
 3. **QUICKSTART.md** - Quick start guide
 4. **INSTALLATION.md** - Detailed installation instructions
 5. **API.md** - Complete API reference
-6. **CONTRIBUTING.md** - Contribution guidelines
-7. **PROJECT-SUMMARY.md** - This file, complete project summary
-8. **DOCUMENTATION.md** - Documentation index and navigation guide
-9. **LICENSE** - MIT License
+6. **ROADMAP.md** - Detailed product roadmap and planned features
+7. **CONTRIBUTING.md** - Contribution guidelines
+8. **PROJECT-SUMMARY.md** - This file, complete project summary
+9. **DOCUMENTATION.md** - Documentation index and navigation guide
+10. **LICENSE** - MIT License
 
 ## Sample Data
 
@@ -251,6 +252,8 @@ Potential features for future versions:
 - Payment processing integration
 - Booking widget
 
+For detailed descriptions, priorities, and technical considerations of planned features, see [ROADMAP.md](ROADMAP.md).
+
 ## License
 
 MIT License - See LICENSE file for details
@@ -262,7 +265,7 @@ MIT License - See LICENSE file for details
 - **React Components**: 7 pages
 - **API Endpoints**: 20+
 - **Database Tables**: 6
-- **Documentation Pages**: 9
+- **Documentation Pages**: 10
 
 ## Conclusion
 
