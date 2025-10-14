@@ -208,14 +208,14 @@ For issues, questions, or suggestions:
 ## Roadmap 🗺️
 
 Future enhancements planned:
-- [ ] User authentication and multi-user support
-- [ ] Email notifications for appointments
-- [ ] Invoice generation
-- [ ] Cloud backup integration
-- [ ] Mobile app version
-- [ ] Advanced reporting and analytics
-- [ ] Integration with payment processors
-- [ ] Booking widget for website integration
+- User authentication and multi-user support
+- Email notifications for appointments
+- Invoice generation
+- Cloud backup integration
+- Mobile app version
+- Advanced reporting and analytics
+- Integration with payment processors
+- Booking widget for website integration
 
 For detailed information about each planned feature, including priorities, technical considerations, and benefits, see [ROADMAP.md](ROADMAP.md).
 
