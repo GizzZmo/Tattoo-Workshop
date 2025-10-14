@@ -4,6 +4,8 @@ A comprehensive studio management suite for tattoo artists and studios, featurin
 
 ## Features ✨
 
+- **🔐 User Authentication**: Secure login system with JWT tokens and role-based access control
+- **👥 Multi-User Support**: Admin, Artist, and Receptionist roles with different permission levels
 - **🤖 AI Tattoo Generator**: Generate detailed tattoo design descriptions using Google Gemini AI
 - **👥 Customer Management**: Secure customer database with contact information and notes
 - **📅 Appointment Scheduling**: Track appointments with customers, artists, and status updates
