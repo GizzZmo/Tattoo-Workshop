@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import ImageCapture from '../components/ImageCapture'
 
 function Portfolio() {
   const [items, setItems] = useState([]);
@@ -11,6 +12,7 @@ function Portfolio() {
     tags: ''
   });
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [showImageCapture, setShowImageCapture] = useState(false);
 
   useEffect(() => {
     fetchPortfolio();
@@ -44,6 +46,7 @@ function Portfolio() {
         showMessage('success', 'Portfolio item added!');
         setShowForm(false);
         setFormData({ title: '', description: '', image_url: '', artist_name: '', tags: '' });
+        setShowImageCapture(false);
         fetchPortfolio();
       }
     } catch (error) {
@@ -63,6 +66,12 @@ function Portfolio() {
     }
   };
 
+  const handleImageCapture = (imageDataUrl) => {
+    setFormData({ ...formData, image_url: imageDataUrl });
+    setShowImageCapture(false);
+    showMessage('success', 'Image captured successfully!');
+  };
+
   return (
     <div className="container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -72,6 +81,7 @@ function Portfolio() {
           onClick={() => {
             setShowForm(!showForm);
             setFormData({ title: '', description: '', image_url: '', artist_name: '', tags: '' });
+            setShowImageCapture(false);
           }}
         >
           {showForm ? 'Cancel' : '+ Add Portfolio Item'}
@@ -106,7 +116,51 @@ function Portfolio() {
               />
             </div>
             <div className="form-group">
-              <label>Image URL *</label>
+              <label>Image *</label>
+              {!showImageCapture && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <button 
+                    type="button"
+                    className="btn-primary" 
+                    onClick={() => setShowImageCapture(true)}
+                    style={{ marginRight: '1rem' }}
+                  >
+                    📷 Capture/Upload Image
+                  </button>
+                  <span style={{ color: '#aaa', fontSize: '0.9em' }}>
+                    or enter URL below
+                  </span>
+                </div>
+              )}
+              {showImageCapture && (
+                <ImageCapture 
+                  onImageCapture={handleImageCapture}
+                  onCancel={() => setShowImageCapture(false)}
+                />
+              )}
+              {formData.image_url && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <img 
+                    src={formData.image_url} 
+                    alt="Preview" 
+                    style={{ 
+                      maxWidth: '200px', 
+                      maxHeight: '200px', 
+                      borderRadius: '4px',
+                      display: 'block',
+                      marginBottom: '0.5rem'
+                    }} 
+                  />
+                  <button 
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setFormData({ ...formData, image_url: '' })}
+                    style={{ fontSize: '0.85em' }}
+                  >
+                    Remove Image
+                  </button>
+                </div>
+              )}
               <input
                 type="url"
                 required
