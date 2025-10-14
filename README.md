@@ -182,11 +182,16 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 
 ## Documentation 📚
 
+For a complete documentation index and navigation guide, see [DOCUMENTATION.md](DOCUMENTATION.md).
+
 - [README.md](README.md) - This file, general overview
+- [ABOUT.md](ABOUT.md) - Project overview, mission, and architecture
 - [QUICKSTART.md](QUICKSTART.md) - Get started quickly
 - [INSTALLATION.md](INSTALLATION.md) - Detailed installation guide
 - [API.md](API.md) - Complete API documentation
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [PROJECT-SUMMARY.md](PROJECT-SUMMARY.md) - Complete project summary
+- [DOCUMENTATION.md](DOCUMENTATION.md) - Documentation index and navigation
 
 ## License 📄
 
