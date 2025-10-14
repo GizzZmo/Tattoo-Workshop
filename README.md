@@ -28,6 +28,10 @@ A comprehensive studio management suite for tattoo artists and studios, featurin
 - Node.js 18.x or higher
 - npm or yarn
 
+### Quick Start
+
+See [QUICKSTART.md](QUICKSTART.md) for a rapid getting-started guide.
+
 ### Setup Steps
 
 1. **Clone the repository**
@@ -51,6 +55,13 @@ A comprehensive studio management suite for tattoo artists and studios, featurin
 4. **Access the application**
    - Open your browser and navigate to `http://localhost:3000`
    - The backend API runs on `http://localhost:3001`
+
+5. **(Optional) Add sample data**
+   ```bash
+   npm run seed
+   ```
+
+For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md).
 
 ## Configuration ⚙️
 
@@ -107,6 +118,7 @@ The dashboard provides an overview of your studio statistics and quick access to
 - `npm run build` - Build the application for production
 - `npm run preview` - Preview the production build
 - `npm run lint` - Run ESLint
+- `npm run seed` - Populate database with sample data
 
 ### Project Structure
 
@@ -160,13 +172,21 @@ The project includes a CI/CD pipeline that:
 
 ## Contributing 🤝
 
-Contributions are welcome! Please feel free to submit issues and pull requests.
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+## Documentation 📚
+
+- [README.md](README.md) - This file, general overview
+- [QUICKSTART.md](QUICKSTART.md) - Get started quickly
+- [INSTALLATION.md](INSTALLATION.md) - Detailed installation guide
+- [API.md](API.md) - Complete API documentation
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 
 ## License 📄
 

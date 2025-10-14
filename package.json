@@ -9,7 +9,8 @@
     "dev:client": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives"
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives",
+    "seed": "node scripts/seed-data.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.1.3",
