@@ -1,0 +1,208 @@
+import { useState, useEffect } from 'react'
+
+function Portfolio() {
+  const [items, setItems] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    image_url: '',
+    artist_name: '',
+    tags: ''
+  });
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  useEffect(() => {
+    fetchPortfolio();
+  }, []);
+
+  const fetchPortfolio = async () => {
+    try {
+      const response = await fetch('/api/portfolio');
+      const data = await response.json();
+      setItems(data);
+    } catch (error) {
+      showMessage('error', 'Failed to fetch portfolio');
+    }
+  };
+
+  const showMessage = (type, text) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/portfolio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        showMessage('success', 'Portfolio item added!');
+        setShowForm(false);
+        setFormData({ title: '', description: '', image_url: '', artist_name: '', tags: '' });
+        fetchPortfolio();
+      }
+    } catch (error) {
+      showMessage('error', 'Failed to add portfolio item');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this portfolio item?')) return;
+    
+    try {
+      await fetch(`/api/portfolio/${id}`, { method: 'DELETE' });
+      showMessage('success', 'Portfolio item deleted!');
+      fetchPortfolio();
+    } catch (error) {
+      showMessage('error', 'Failed to delete portfolio item');
+    }
+  };
+
+  return (
+    <div className="container">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h1>Portfolio</h1>
+        <button 
+          className="btn-primary" 
+          onClick={() => {
+            setShowForm(!showForm);
+            setFormData({ title: '', description: '', image_url: '', artist_name: '', tags: '' });
+          }}
+        >
+          {showForm ? 'Cancel' : '+ Add Portfolio Item'}
+        </button>
+      </div>
+
+      {message.text && (
+        <div className={`alert alert-${message.type}`}>
+          {message.text}
+        </div>
+      )}
+
+      {showForm && (
+        <div className="card" style={{ marginBottom: '2rem' }}>
+          <h2>Add New Portfolio Item</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Title *</label>
+              <input
+                type="text"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                rows="3"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Image URL *</label>
+              <input
+                type="url"
+                required
+                placeholder="https://example.com/image.jpg"
+                value={formData.image_url}
+                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Artist Name</label>
+              <input
+                type="text"
+                value={formData.artist_name}
+                onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Tags (comma-separated)</label>
+              <input
+                type="text"
+                placeholder="e.g., traditional, sleeve, color"
+                value={formData.tags}
+                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              />
+            </div>
+            <button type="submit" className="btn-success">
+              Add to Portfolio
+            </button>
+          </form>
+        </div>
+      )}
+
+      {items.length === 0 ? (
+        <div className="card">
+          <p style={{ color: '#aaa' }}>No portfolio items yet. Add your first one!</p>
+        </div>
+      ) : (
+        <div className="grid grid-3">
+          {items.map(item => (
+            <div key={item.id} className="card">
+              <img 
+                src={item.image_url} 
+                alt={item.title}
+                style={{ 
+                  width: '100%', 
+                  height: '200px', 
+                  objectFit: 'cover', 
+                  borderRadius: '4px',
+                  marginBottom: '1rem'
+                }}
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/300x200?text=Image+Not+Found';
+                }}
+              />
+              <h3>{item.title}</h3>
+              {item.artist_name && (
+                <p style={{ color: '#aaa', fontSize: '0.9em', marginTop: '0.5rem' }}>
+                  Artist: {item.artist_name}
+                </p>
+              )}
+              {item.description && (
+                <p style={{ marginTop: '0.5rem', fontSize: '0.9em' }}>{item.description}</p>
+              )}
+              {item.tags && (
+                <div style={{ marginTop: '0.5rem' }}>
+                  {item.tags.split(',').map((tag, i) => (
+                    <span 
+                      key={i}
+                      style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.5rem',
+                        marginRight: '0.5rem',
+                        marginTop: '0.5rem',
+                        backgroundColor: '#2a2a2a',
+                        borderRadius: '4px',
+                        fontSize: '0.8em'
+                      }}
+                    >
+                      {tag.trim()}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <button 
+                className="btn-danger" 
+                onClick={() => handleDelete(item.id)}
+                style={{ marginTop: '1rem', width: '100%' }}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default Portfolio
