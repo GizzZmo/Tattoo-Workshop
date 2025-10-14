@@ -22,7 +22,7 @@ Start here if you're new to Tattoo Workshop:
    - Architecture details
    - Key features explained
    - Development philosophy
-   - Future roadmap
+   - Future roadmap overview
 
 3. **[QUICKSTART.md](QUICKSTART.md)** - Get running in 5 minutes
    - Rapid setup guide
@@ -37,9 +37,17 @@ Start here if you're new to Tattoo Workshop:
    - Configuration options
    - Troubleshooting common issues
 
+### Planning & Roadmap
+
+5. **[ROADMAP.md](ROADMAP.md)** - Detailed product roadmap
+   - Planned features with priorities
+   - Technical considerations
+   - Development phases
+   - Timeline estimates
+
 ### Using the Application
 
-5. **User Guide** (in README.md)
+6. **User Guide** (in README.md)
    - Customer Management
    - Appointment Scheduling
    - Pricelist Management
@@ -49,19 +57,19 @@ Start here if you're new to Tattoo Workshop:
 
 ### Development
 
-6. **[API.md](API.md)** - Complete API documentation
+7. **[API.md](API.md)** - Complete API documentation
    - All API endpoints
    - Request/response formats
    - Authentication details
    - Example requests
 
-7. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+8. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
    - How to contribute
    - Coding standards
    - Pull request process
    - Development workflow
 
-8. **[PROJECT-SUMMARY.md](PROJECT-SUMMARY.md)** - Complete project summary
+9. **[PROJECT-SUMMARY.md](PROJECT-SUMMARY.md)** - Complete project summary
    - Project structure
    - Implementation details
    - Testing information
@@ -69,7 +77,7 @@ Start here if you're new to Tattoo Workshop:
 
 ### Legal
 
-9. **[LICENSE](LICENSE)** - MIT License
+10. **[LICENSE](LICENSE)** - MIT License
    - Terms and conditions
    - Usage rights
    - Liability information
@@ -87,6 +95,7 @@ Start here if you're new to Tattoo Workshop:
 - [Feature Overview](README.md#features-)
 - [AI Generator Setup](README.md#configuration-️)
 - [Usage Guide](README.md#usage-guide-)
+- [Future Roadmap](ROADMAP.md)
 
 **Development**
 - [API Reference](API.md)
