@@ -29,7 +29,6 @@ jobs:
     
     - name: Lint code
       run: npm run lint
-      continue-on-error: true
     
     - name: Build application
       run: npm run build
