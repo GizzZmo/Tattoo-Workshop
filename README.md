@@ -210,7 +210,6 @@ For issues, questions, or suggestions:
 ## Roadmap 🗺️
 
 Future enhancements planned:
-- User authentication and multi-user support
 - Email notifications for appointments
 - Invoice generation
 - Cloud backup integration

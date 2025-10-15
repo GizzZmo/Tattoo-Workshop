@@ -1,6 +1,6 @@
 {
   "name": "tattoo-workshop",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "An application for Tattoo studios with AI-driven tattoo generator, customer management, and more",
   "type": "module",
   "scripts": {
