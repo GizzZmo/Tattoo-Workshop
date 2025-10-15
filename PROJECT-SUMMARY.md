@@ -243,7 +243,6 @@ The seed script (`npm run seed`) creates:
 ## Future Enhancements (Roadmap)
 
 Potential features for future versions:
-- User authentication and authorization
 - Email notifications
 - Invoice generation
 - Cloud backup integration

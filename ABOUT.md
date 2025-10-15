@@ -149,7 +149,6 @@ The application follows a three-tier architecture:
 ## 🛣️ Future Roadmap
 
 Planned enhancements include:
-- User authentication and multi-user support
 - Email notifications for appointments
 - Invoice generation and financial tracking
 - Cloud backup integration (optional)
