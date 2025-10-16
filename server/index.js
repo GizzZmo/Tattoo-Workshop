@@ -11,6 +11,13 @@ import EmailScheduler from './email/scheduler.js';
 import { initializeTemplates } from './email/templates.js';
 import RateLimit from 'express-rate-limit';
 const __filename = fileURLToPath(import.meta.url);
+
+// Rate limiter for sensitive admin/config routes
+const configLimiter = RateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5, // limit to 5 requests per minute per IP
+  message: "Too many configuration changes from this IP, please try again later."
+});
 const __dirname = dirname(__filename);
 
 const app = express();
@@ -448,7 +455,7 @@ app.get('/api/email/config', (req, res) => {
   }
 });
 
-app.post('/api/email/config', (req, res) => {
+app.post('/api/email/config', configLimiter, (req, res) => {
   try {
     const { enabled, smtp_host, smtp_port, smtp_secure, smtp_user, smtp_password, from_address, from_name, reminders_enabled } = req.body;
     
