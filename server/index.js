@@ -6,6 +6,9 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { setupAuthRoutes } from './auth/routes.js';
+import EmailService from './email/service.js';
+import EmailScheduler from './email/scheduler.js';
+import { initializeTemplates } from './email/templates.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -95,10 +98,41 @@ db.exec(`
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME
   );
+
+  CREATE TABLE IF NOT EXISTS email_templates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL,
+    subject TEXT NOT NULL,
+    body TEXT NOT NULL,
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS email_notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER NOT NULL,
+    appointment_id INTEGER,
+    type TEXT NOT NULL,
+    recipient TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    sent_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id),
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
+  );
 `);
 
 // Setup authentication routes
 setupAuthRoutes(app, db);
+
+// Initialize email templates and service
+initializeTemplates(db);
+const emailService = new EmailService(db);
+const emailScheduler = new EmailScheduler(db);
+
+// Start email scheduler (check every hour for reminders)
+emailScheduler.start(60);
 
 // Settings API
 app.get('/api/settings/:key', (req, res) => {
@@ -227,22 +261,79 @@ app.get('/api/appointments', (req, res) => {
   }
 });
 
-app.post('/api/appointments', (req, res) => {
+app.post('/api/appointments', async (req, res) => {
   try {
     const { customer_id, artist_name, appointment_date, duration, notes } = req.body;
     const stmt = db.prepare('INSERT INTO appointments (customer_id, artist_name, appointment_date, duration, notes) VALUES (?, ?, ?, ?, ?)');
     const info = stmt.run(customer_id, artist_name, appointment_date, duration, notes);
+    
+    // Send confirmation email
+    const customerStmt = db.prepare('SELECT * FROM customers WHERE id = ?');
+    const customer = customerStmt.get(customer_id);
+    
+    if (customer) {
+      const appointment = {
+        id: info.lastInsertRowid,
+        customer_id,
+        artist_name,
+        appointment_date,
+        duration,
+        notes,
+      };
+      
+      // Send email asynchronously (don't wait for it)
+      emailService.sendAppointmentConfirmation(appointment, customer).catch(err => {
+        console.error('Failed to send confirmation email:', err);
+      });
+    }
+    
     res.json({ success: true, id: info.lastInsertRowid });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-app.put('/api/appointments/:id', (req, res) => {
+app.put('/api/appointments/:id', async (req, res) => {
   try {
     const { artist_name, appointment_date, duration, status, notes } = req.body;
+    
+    // Get the old appointment data for comparison
+    const oldAppointmentStmt = db.prepare('SELECT * FROM appointments WHERE id = ?');
+    const oldAppointment = oldAppointmentStmt.get(req.params.id);
+    
+    // Update the appointment
     const stmt = db.prepare('UPDATE appointments SET artist_name = ?, appointment_date = ?, duration = ?, status = ?, notes = ? WHERE id = ?');
     stmt.run(artist_name, appointment_date, duration, status, notes, req.params.id);
+    
+    // Get customer info
+    const customerStmt = db.prepare('SELECT * FROM customers WHERE id = ?');
+    const customer = customerStmt.get(oldAppointment.customer_id);
+    
+    if (customer) {
+      const updatedAppointment = {
+        id: req.params.id,
+        customer_id: oldAppointment.customer_id,
+        artist_name,
+        appointment_date,
+        duration,
+        status,
+        notes,
+      };
+      
+      // Check if appointment was cancelled
+      if (status === 'cancelled' && oldAppointment.status !== 'cancelled') {
+        emailService.sendCancellationNotification(updatedAppointment, customer).catch(err => {
+          console.error('Failed to send cancellation email:', err);
+        });
+      }
+      // Check if appointment was rescheduled
+      else if (appointment_date !== oldAppointment.appointment_date) {
+        emailService.sendReschedulingNotification(updatedAppointment, customer, oldAppointment.appointment_date).catch(err => {
+          console.error('Failed to send rescheduling email:', err);
+        });
+      }
+    }
+    
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -340,6 +431,117 @@ app.get('/api/generated-tattoos', (req, res) => {
     const stmt = db.prepare('SELECT * FROM generated_tattoos ORDER BY created_at DESC LIMIT 50');
     const items = stmt.all();
     res.json(items);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Email Configuration API
+app.get('/api/email/config', (req, res) => {
+  try {
+    const config = emailService.getEmailConfig();
+    // Don't expose the password
+    delete config.smtp_password;
+    res.json(config);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/email/config', (req, res) => {
+  try {
+    const { enabled, smtp_host, smtp_port, smtp_secure, smtp_user, smtp_password, from_address, from_name, reminders_enabled } = req.body;
+    
+    const settings = [
+      { key: 'email_enabled', value: enabled },
+      { key: 'email_smtp_host', value: smtp_host },
+      { key: 'email_smtp_port', value: smtp_port },
+      { key: 'email_smtp_secure', value: smtp_secure },
+      { key: 'email_smtp_user', value: smtp_user },
+      { key: 'email_from_address', value: from_address },
+      { key: 'email_from_name', value: from_name },
+      { key: 'email_reminders_enabled', value: reminders_enabled },
+    ];
+    
+    // Only update password if it's provided
+    if (smtp_password) {
+      settings.push({ key: 'email_smtp_password', value: smtp_password });
+    }
+    
+    const stmt = db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+    settings.forEach(setting => {
+      if (setting.value !== undefined) {
+        stmt.run(setting.key, String(setting.value));
+      }
+    });
+    
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/email/test', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email address required' });
+    }
+    
+    const result = await emailService.sendTestEmail(email);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Email Templates API
+app.get('/api/email/templates', (req, res) => {
+  try {
+    const stmt = db.prepare('SELECT * FROM email_templates ORDER BY name');
+    const templates = stmt.all();
+    res.json(templates);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/email/templates/:name', (req, res) => {
+  try {
+    const template = emailService.getTemplate(req.params.name);
+    if (template) {
+      res.json(template);
+    } else {
+      res.status(404).json({ error: 'Template not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/email/templates/:name', (req, res) => {
+  try {
+    const { subject, body } = req.body;
+    const stmt = db.prepare('UPDATE email_templates SET subject = ?, body = ?, updated_at = datetime("now") WHERE name = ?');
+    stmt.run(subject, body, req.params.name);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Email Notifications Log API
+app.get('/api/email/notifications', (req, res) => {
+  try {
+    const stmt = db.prepare(`
+      SELECT en.*, c.name as customer_name, c.email as customer_email
+      FROM email_notifications en
+      JOIN customers c ON en.customer_id = c.id
+      ORDER BY en.created_at DESC
+      LIMIT 100
+    `);
+    const notifications = stmt.all();
+    res.json(notifications);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

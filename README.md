@@ -9,6 +9,7 @@ A comprehensive studio management suite for tattoo artists and studios, featurin
 - **🤖 AI Tattoo Generator**: Generate detailed tattoo design descriptions using Google Gemini AI
 - **👥 Customer Management**: Secure customer database with contact information and notes
 - **📅 Appointment Scheduling**: Track appointments with customers, artists, and status updates
+- **📧 Email Notifications**: Automated appointment confirmations, reminders, and updates
 - **💰 Dynamic Pricelist**: Manage services with categories, pricing, and duration estimates
 - **🖼️ Portfolio Gallery**: Showcase your work with images, descriptions, and tags
 - **⚙️ Settings Management**: Configure API keys and application preferences
@@ -19,6 +20,7 @@ A comprehensive studio management suite for tattoo artists and studios, featurin
 - **Frontend**: React 18 + Vite
 - **Backend**: Node.js + Express
 - **Database**: SQLite (better-sqlite3)
+- **Email**: Nodemailer
 - **AI Integration**: Google Gemini API
 - **Styling**: Custom CSS with responsive design
 - **Routing**: React Router v6
@@ -77,6 +79,15 @@ To use the AI Tattoo Generator feature:
 4. In the application, navigate to **Settings**
 5. Enter your API key and save
 
+### Email Notifications (Optional)
+
+To enable email notifications for appointments:
+
+1. Configure SMTP settings via the API or Settings page
+2. Supported providers: Gmail, SendGrid, Mailgun, Office 365, etc.
+3. Enable appointment confirmations and reminders
+4. For detailed setup instructions, see [EMAIL-NOTIFICATIONS.md](EMAIL-NOTIFICATIONS.md)
+
 ## Usage Guide 📖
 
 ### Dashboard
@@ -92,6 +103,7 @@ The dashboard provides an overview of your studio statistics and quick access to
 - Assign artists to appointments
 - Set duration and add notes
 - Track appointment status (scheduled, completed, cancelled)
+- Receive email confirmations and reminders automatically
 
 ### Pricelist
 - Create service categories
@@ -191,6 +203,7 @@ For a complete documentation index and navigation guide, see [DOCUMENTATION.md](
 - [QUICKSTART.md](QUICKSTART.md) - Get started quickly
 - [INSTALLATION.md](INSTALLATION.md) - Detailed installation guide
 - [API.md](API.md) - Complete API documentation
+- [EMAIL-NOTIFICATIONS.md](EMAIL-NOTIFICATIONS.md) - Email notification system guide
 - [ROADMAP.md](ROADMAP.md) - Detailed product roadmap and planned features
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 - [PROJECT-SUMMARY.md](PROJECT-SUMMARY.md) - Complete project summary
@@ -210,7 +223,7 @@ For issues, questions, or suggestions:
 ## Roadmap 🗺️
 
 Future enhancements planned:
-- Email notifications for appointments
+- ✅ Email notifications for appointments (COMPLETED)
 - Invoice generation
 - Cloud backup integration
 - Mobile app version

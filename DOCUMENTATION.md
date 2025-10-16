@@ -63,19 +63,23 @@ Start here if you're new to Tattoo Workshop:
    - Authentication details
    - Example requests
 
-8. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+8. **[EMAIL-NOTIFICATIONS.md](EMAIL-NOTIFICATIONS.md)** - Email notification system
+   - Email configuration guide
+   - SMTP provider setup
+   - Template customization
+   - Troubleshooting
+
+9. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
    - How to contribute
    - Coding standards
    - Pull request process
    - Development workflow
 
-9. **[PROJECT-SUMMARY.md](PROJECT-SUMMARY.md)** - Complete project summary
+10. **[PROJECT-SUMMARY.md](PROJECT-SUMMARY.md)** - Complete project summary
    - Project structure
    - Implementation details
    - Testing information
    - Metrics and statistics
-
-### Legal
 
 10. **[LICENSE](LICENSE)** - MIT License
    - Terms and conditions
@@ -94,6 +98,7 @@ Start here if you're new to Tattoo Workshop:
 **Features & Usage**
 - [Feature Overview](README.md#features-)
 - [AI Generator Setup](README.md#configuration-️)
+- [Email Notifications](EMAIL-NOTIFICATIONS.md)
 - [Usage Guide](README.md#usage-guide-)
 - [Future Roadmap](ROADMAP.md)
 
@@ -138,6 +143,7 @@ Start here if you're new to Tattoo Workshop:
 ### Using Features
 - **Manage customers**: See [README.md - Customer Management](README.md#customer-management)
 - **Schedule appointments**: See [README.md - Appointments](README.md#appointments)
+- **Configure email notifications**: See [EMAIL-NOTIFICATIONS.md](EMAIL-NOTIFICATIONS.md)
 - **Use AI generator**: Configure API key in Settings, then use Generator page
 
 ### Development
