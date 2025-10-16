@@ -9,7 +9,7 @@ import { setupAuthRoutes } from './auth/routes.js';
 import EmailService from './email/service.js';
 import EmailScheduler from './email/scheduler.js';
 import { initializeTemplates } from './email/templates.js';
-
+import RateLimit from 'express-rate-limit';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -496,7 +496,12 @@ app.post('/api/email/test', async (req, res) => {
 });
 
 // Email Templates API
-app.get('/api/email/templates', (req, res) => {
+const emailTemplatesLimiter = RateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+app.get('/api/email/templates', emailTemplatesLimiter, (req, res) => {
   try {
     const stmt = db.prepare('SELECT * FROM email_templates ORDER BY name');
     const templates = stmt.all();
