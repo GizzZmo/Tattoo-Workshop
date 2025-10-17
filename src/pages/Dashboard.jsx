@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -8,11 +8,7 @@ function Dashboard() {
     pricelistItems: 0
   });
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const [customers, appointments, portfolio, pricelist] = await Promise.all([
         fetch('/api/customers').then(r => r.json()),
@@ -30,7 +26,11 @@ function Dashboard() {
     } catch (error) {
       console.error('Error fetching stats:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   return (
     <div className="container">

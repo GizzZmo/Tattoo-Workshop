@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import ImageCapture from '../components/ImageCapture'
 
 function Portfolio() {
@@ -14,24 +14,24 @@ function Portfolio() {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showImageCapture, setShowImageCapture] = useState(false);
 
-  useEffect(() => {
-    fetchPortfolio();
+  const showMessage = useCallback((type, text) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   }, []);
 
-  const fetchPortfolio = async () => {
+  const fetchPortfolio = useCallback(async () => {
     try {
       const response = await fetch('/api/portfolio');
       const data = await response.json();
       setItems(data);
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to fetch portfolio');
     }
-  };
+  }, [showMessage]);
 
-  const showMessage = (type, text) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-  };
+  useEffect(() => {
+    fetchPortfolio();
+  }, [fetchPortfolio]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +49,7 @@ function Portfolio() {
         setShowImageCapture(false);
         fetchPortfolio();
       }
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to add portfolio item');
     }
   };
@@ -61,7 +61,7 @@ function Portfolio() {
       await fetch(`/api/portfolio/${id}`, { method: 'DELETE' });
       showMessage('success', 'Portfolio item deleted!');
       fetchPortfolio();
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to delete portfolio item');
     }
   };

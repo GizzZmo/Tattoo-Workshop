@@ -20,7 +20,7 @@ function TattooGenerator() {
       if (data.value) {
         setApiKey(data.value);
       }
-    } catch (error) {
+    } catch {
       console.error('Failed to fetch API key');
     }
   };
@@ -30,7 +30,7 @@ function TattooGenerator() {
       const response = await fetch('/api/generated-tattoos');
       const data = await response.json();
       setHistory(data);
-    } catch (error) {
+    } catch {
       console.error('Failed to fetch history');
     }
   };
@@ -67,7 +67,7 @@ function TattooGenerator() {
       } else {
         showMessage('error', data.error || 'Failed to generate tattoo design');
       }
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to generate tattoo design. Please check your API key.');
     } finally {
       setLoading(false);

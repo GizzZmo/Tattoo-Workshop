@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -13,24 +13,24 @@ function Customers() {
   });
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  useEffect(() => {
-    fetchCustomers();
+  const showMessage = useCallback((type, text) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   }, []);
 
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     try {
       const response = await fetch('/api/customers');
       const data = await response.json();
       setCustomers(data);
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to fetch customers');
     }
-  };
+  }, [showMessage]);
 
-  const showMessage = (type, text) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-  };
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,7 +51,7 @@ function Customers() {
         setFormData({ name: '', email: '', phone: '', address: '', notes: '' });
         fetchCustomers();
       }
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to save customer');
     }
   };
@@ -75,7 +75,7 @@ function Customers() {
       await fetch(`/api/customers/${id}`, { method: 'DELETE' });
       showMessage('success', 'Customer deleted!');
       fetchCustomers();
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to delete customer');
     }
   };
