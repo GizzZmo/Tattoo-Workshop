@@ -5,9 +5,10 @@ function Settings() {
   const [savedApiKey, setSavedApiKey] = useState('');
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
+  const showMessage = (type, text) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+  };
 
   const fetchSettings = async () => {
     try {
@@ -17,15 +18,14 @@ function Settings() {
         setSavedApiKey(data.value);
         setApiKey(data.value);
       }
-    } catch (error) {
+    } catch {
       console.error('Failed to fetch settings');
     }
   };
 
-  const showMessage = (type, text) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-  };
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -43,7 +43,7 @@ function Settings() {
       } else {
         showMessage('error', 'Failed to save API key');
       }
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to save API key');
     }
   };
@@ -63,7 +63,7 @@ function Settings() {
         setSavedApiKey('');
         showMessage('success', 'API key removed!');
       }
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to remove API key');
     }
   };

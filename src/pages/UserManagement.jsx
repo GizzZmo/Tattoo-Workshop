@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function UserManagement() {
@@ -17,11 +17,7 @@ export default function UserManagement() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/users', {
         headers: {
@@ -38,7 +34,11 @@ export default function UserManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,7 +75,7 @@ export default function UserManagement() {
           : data.error;
         setError(errorMsg);
       }
-    } catch (error) {
+    } catch {
       setError('Failed to create user');
     }
   };
@@ -95,7 +95,7 @@ export default function UserManagement() {
         setSuccess('User status updated!');
         fetchUsers();
       }
-    } catch (error) {
+    } catch {
       setError('Failed to update user status');
     }
   };
@@ -118,7 +118,7 @@ export default function UserManagement() {
         const data = await response.json();
         setError(data.error);
       }
-    } catch (error) {
+    } catch {
       setError('Failed to delete user');
     }
   };

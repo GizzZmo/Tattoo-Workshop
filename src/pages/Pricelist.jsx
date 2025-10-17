@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 function Pricelist() {
   const [items, setItems] = useState([]);
@@ -13,24 +13,24 @@ function Pricelist() {
   });
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  useEffect(() => {
-    fetchPricelist();
+  const showMessage = useCallback((type, text) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   }, []);
 
-  const fetchPricelist = async () => {
+  const fetchPricelist = useCallback(async () => {
     try {
       const response = await fetch('/api/pricelist');
       const data = await response.json();
       setItems(data);
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to fetch pricelist');
     }
-  };
+  }, [showMessage]);
 
-  const showMessage = (type, text) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-  };
+  useEffect(() => {
+    fetchPricelist();
+  }, [fetchPricelist]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,7 +51,7 @@ function Pricelist() {
         setFormData({ service_name: '', description: '', price: '', duration: '', category: '' });
         fetchPricelist();
       }
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to save service');
     }
   };
@@ -75,7 +75,7 @@ function Pricelist() {
       await fetch(`/api/pricelist/${id}`, { method: 'DELETE' });
       showMessage('success', 'Service deleted!');
       fetchPricelist();
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to delete service');
     }
   };

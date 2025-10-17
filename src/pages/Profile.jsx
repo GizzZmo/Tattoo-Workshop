@@ -45,7 +45,7 @@ export default function Profile() {
           : data.error;
         setError(errorMsg);
       }
-    } catch (error) {
+    } catch {
       setError('Failed to update profile');
     }
   };
@@ -89,7 +89,7 @@ export default function Profile() {
           : data.error;
         setError(errorMsg);
       }
-    } catch (error) {
+    } catch {
       setError('Failed to change password');
     }
   };

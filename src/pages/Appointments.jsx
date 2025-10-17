@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 function Appointments() {
   const [appointments, setAppointments] = useState([]);
@@ -15,35 +15,35 @@ function Appointments() {
   });
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  useEffect(() => {
-    fetchAppointments();
-    fetchCustomers();
+  const showMessage = useCallback((type, text) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   }, []);
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
     try {
       const response = await fetch('/api/appointments');
       const data = await response.json();
       setAppointments(data);
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to fetch appointments');
     }
-  };
+  }, [showMessage]);
 
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     try {
       const response = await fetch('/api/customers');
       const data = await response.json();
       setCustomers(data);
-    } catch (error) {
+    } catch {
       console.error('Failed to fetch customers');
     }
-  };
+  }, []);
 
-  const showMessage = (type, text) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-  };
+  useEffect(() => {
+    fetchAppointments();
+    fetchCustomers();
+  }, [fetchAppointments, fetchCustomers]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,7 +64,7 @@ function Appointments() {
         setFormData({ customer_id: '', artist_name: '', appointment_date: '', duration: '', status: 'scheduled', notes: '' });
         fetchAppointments();
       }
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to save appointment');
     }
   };
@@ -89,7 +89,7 @@ function Appointments() {
       await fetch(`/api/appointments/${id}`, { method: 'DELETE' });
       showMessage('success', 'Appointment deleted!');
       fetchAppointments();
-    } catch (error) {
+    } catch {
       showMessage('error', 'Failed to delete appointment');
     }
   };

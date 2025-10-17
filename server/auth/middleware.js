@@ -32,7 +32,7 @@ export function authenticate(req, res, next) {
     // Attach user info to request
     req.user = decoded;
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({ error: 'Authentication failed' });
   }
 }
@@ -81,7 +81,7 @@ export function optionalAuth(req, res, next) {
     }
     
     next();
-  } catch (error) {
+  } catch {
     next();
   }
 }
