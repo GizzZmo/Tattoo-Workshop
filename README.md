@@ -1,5 +1,9 @@
 # Tattoo Workshop 🎨
 
+[![CI/CD Pipeline](https://github.com/GizzZmo/Tattoo-Workshop/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/GizzZmo/Tattoo-Workshop/actions/workflows/ci-cd.yml)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A comprehensive studio management suite for tattoo artists and studios, featuring AI-powered design generation, customer management, appointment scheduling, and more.
 
 ## Features ✨
