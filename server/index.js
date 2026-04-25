@@ -770,7 +770,13 @@ app.post('/api/invoices/from-appointment/:appointmentId', invoiceLimiter, (req, 
 });
 
 // Analytics API
-app.get('/api/analytics', (req, res) => {
+const analyticsLimiter = RateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60,
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+app.get('/api/analytics', analyticsLimiter, (req, res) => {
   try {
     const totalRevenue = db.prepare(
       "SELECT COALESCE(SUM(amount_paid), 0) as total FROM invoices WHERE status IN ('paid', 'partial')"
