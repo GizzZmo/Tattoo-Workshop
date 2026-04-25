@@ -5,23 +5,26 @@ function Dashboard() {
     customers: 0,
     appointments: 0,
     portfolioItems: 0,
-    pricelistItems: 0
+    pricelistItems: 0,
+    invoices: 0,
   });
 
   const fetchStats = useCallback(async () => {
     try {
-      const [customers, appointments, portfolio, pricelist] = await Promise.all([
+      const [customers, appointments, portfolio, pricelist, invoices] = await Promise.all([
         fetch('/api/customers').then(r => r.json()),
         fetch('/api/appointments').then(r => r.json()),
         fetch('/api/portfolio').then(r => r.json()),
-        fetch('/api/pricelist').then(r => r.json())
+        fetch('/api/pricelist').then(r => r.json()),
+        fetch('/api/invoices').then(r => r.json()),
       ]);
 
       setStats({
         customers: customers.length,
         appointments: appointments.length,
         portfolioItems: portfolio.length,
-        pricelistItems: pricelist.length
+        pricelistItems: pricelist.length,
+        invoices: invoices.length,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -47,6 +50,7 @@ function Dashboard() {
             <p><strong>Appointments:</strong> {stats.appointments}</p>
             <p><strong>Portfolio Items:</strong> {stats.portfolioItems}</p>
             <p><strong>Services:</strong> {stats.pricelistItems}</p>
+            <p><strong>Invoices:</strong> {stats.invoices}</p>
           </div>
         </div>
 
