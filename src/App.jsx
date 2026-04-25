@@ -11,6 +11,7 @@ import TattooGenerator from './pages/TattooGenerator'
 import Settings from './pages/Settings'
 import Profile from './pages/Profile'
 import UserManagement from './pages/UserManagement'
+import Invoices from './pages/Invoices'
 
 function Navigation() {
   const location = useLocation();
@@ -46,6 +47,7 @@ function Navigation() {
         {user?.role === 'admin' && (
           <li><Link to="/users" className={isActive('/users')}>Users</Link></li>
         )}
+        <li><Link to="/invoices" className={isActive('/invoices')}>Invoices</Link></li>
         <li><Link to="/profile" className={isActive('/profile')}>Profile</Link></li>
         <li style={{ marginLeft: 'auto' }}>
           <span style={{ marginRight: '1rem', color: '#666' }}>
@@ -83,6 +85,7 @@ function AppRoutes() {
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/users" element={<ProtectedRoute roles={['admin']}><UserManagement /></ProtectedRoute>} />
+      <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
     </Routes>
   );
 }

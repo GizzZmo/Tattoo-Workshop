@@ -128,6 +128,36 @@ db.exec(`
     FOREIGN KEY (customer_id) REFERENCES customers(id),
     FOREIGN KEY (appointment_id) REFERENCES appointments(id)
   );
+
+  CREATE TABLE IF NOT EXISTS invoices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    invoice_number TEXT UNIQUE NOT NULL,
+    customer_id INTEGER NOT NULL,
+    appointment_id INTEGER,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'partial', 'paid', 'cancelled')),
+    subtotal REAL NOT NULL DEFAULT 0,
+    tax_rate REAL NOT NULL DEFAULT 0,
+    tax_amount REAL NOT NULL DEFAULT 0,
+    total REAL NOT NULL DEFAULT 0,
+    deposit_amount REAL NOT NULL DEFAULT 0,
+    amount_paid REAL NOT NULL DEFAULT 0,
+    notes TEXT,
+    due_date DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id),
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS invoice_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    invoice_id INTEGER NOT NULL,
+    description TEXT NOT NULL,
+    quantity REAL NOT NULL DEFAULT 1,
+    unit_price REAL NOT NULL DEFAULT 0,
+    total REAL NOT NULL DEFAULT 0,
+    FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
+  );
 `);
 
 // Setup authentication routes
@@ -554,6 +584,186 @@ app.get('/api/email/notifications', (req, res) => {
     `);
     const notifications = stmt.all();
     res.json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Rate limiter for invoice API routes
+const invoiceLimiter = RateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200,
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+// Helper: generate next invoice number
+function generateInvoiceNumber(db) {
+  const row = db.prepare("SELECT value FROM settings WHERE key = 'invoice_counter'").get();
+  const counter = row ? parseInt(row.value, 10) + 1 : 1;
+  db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('invoice_counter', ?)").run(String(counter));
+  return `INV-${String(counter).padStart(5, '0')}`;
+}
+
+// Helper: recalculate invoice totals from items
+function recalculateInvoiceTotals(db, invoiceId) {
+  const items = db.prepare('SELECT * FROM invoice_items WHERE invoice_id = ?').all(invoiceId);
+  const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+  const invoice = db.prepare('SELECT tax_rate, amount_paid, deposit_amount FROM invoices WHERE id = ?').get(invoiceId);
+  if (!invoice) return;
+  const taxAmount = subtotal * (invoice.tax_rate / 100);
+  const total = subtotal + taxAmount;
+  const amountPaid = invoice.amount_paid;
+  let status = 'pending';
+  if (amountPaid >= total && total > 0) status = 'paid';
+  else if (amountPaid > 0) status = 'partial';
+  db.prepare(
+    'UPDATE invoices SET subtotal = ?, tax_amount = ?, total = ?, status = ?, updated_at = datetime("now") WHERE id = ?'
+  ).run(subtotal, taxAmount, total, status, invoiceId);
+}
+
+// Invoices API
+app.get('/api/invoices', invoiceLimiter, (req, res) => {
+  try {
+    const invoices = db.prepare(`
+      SELECT i.*, c.name as customer_name, c.email as customer_email
+      FROM invoices i
+      JOIN customers c ON i.customer_id = c.id
+      ORDER BY i.created_at DESC
+    `).all();
+    res.json(invoices);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/invoices/:id', invoiceLimiter, (req, res) => {
+  try {
+    const invoice = db.prepare(`
+      SELECT i.*, c.name as customer_name, c.email as customer_email, c.phone as customer_phone, c.address as customer_address
+      FROM invoices i
+      JOIN customers c ON i.customer_id = c.id
+      WHERE i.id = ?
+    `).get(req.params.id);
+    if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
+    const items = db.prepare('SELECT * FROM invoice_items WHERE invoice_id = ? ORDER BY id').all(req.params.id);
+    res.json({ ...invoice, items });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/invoices', invoiceLimiter, (req, res) => {
+  try {
+    const { customer_id, appointment_id, tax_rate, deposit_amount, amount_paid, notes, due_date, items } = req.body;
+    const invoiceNumber = generateInvoiceNumber(db);
+    const initialAmountPaid = amount_paid !== undefined ? Number(amount_paid) : 0;
+    const info = db.prepare(
+      'INSERT INTO invoices (invoice_number, customer_id, appointment_id, tax_rate, deposit_amount, amount_paid, notes, due_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    ).run(invoiceNumber, customer_id, appointment_id || null, tax_rate || 0, deposit_amount || 0, initialAmountPaid, notes || null, due_date || null);
+    const invoiceId = info.lastInsertRowid;
+    if (Array.isArray(items)) {
+      const insertItem = db.prepare('INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total) VALUES (?, ?, ?, ?, ?)');
+      for (const item of items) {
+        const total = (item.quantity || 1) * (item.unit_price || 0);
+        insertItem.run(invoiceId, item.description, item.quantity || 1, item.unit_price || 0, total);
+      }
+    }
+    recalculateInvoiceTotals(db, invoiceId);
+    res.json({ success: true, id: invoiceId, invoice_number: invoiceNumber });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/invoices/:id', invoiceLimiter, (req, res) => {
+  try {
+    const { tax_rate, deposit_amount, amount_paid, notes, due_date, status } = req.body;
+    const invoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(req.params.id);
+    if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
+    const newAmountPaid = amount_paid !== undefined ? amount_paid : invoice.amount_paid;
+    const newTotal = invoice.total;
+    let newStatus = status;
+    if (!newStatus) {
+      if (newAmountPaid >= newTotal && newTotal > 0) newStatus = 'paid';
+      else if (newAmountPaid > 0) newStatus = 'partial';
+      else newStatus = 'pending';
+    }
+    db.prepare(
+      'UPDATE invoices SET tax_rate = ?, deposit_amount = ?, amount_paid = ?, notes = ?, due_date = ?, status = ?, updated_at = datetime("now") WHERE id = ?'
+    ).run(tax_rate !== undefined ? tax_rate : invoice.tax_rate, deposit_amount !== undefined ? deposit_amount : invoice.deposit_amount, newAmountPaid, notes !== undefined ? notes : invoice.notes, due_date !== undefined ? due_date : invoice.due_date, newStatus, req.params.id);
+    recalculateInvoiceTotals(db, req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/invoices/:id', invoiceLimiter, (req, res) => {
+  try {
+    db.prepare('DELETE FROM invoice_items WHERE invoice_id = ?').run(req.params.id);
+    db.prepare('DELETE FROM invoices WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Invoice items
+app.post('/api/invoices/:id/items', invoiceLimiter, (req, res) => {
+  try {
+    const { description, quantity, unit_price } = req.body;
+    const total = (quantity || 1) * (unit_price || 0);
+    const info = db.prepare('INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total) VALUES (?, ?, ?, ?, ?)').run(req.params.id, description, quantity || 1, unit_price || 0, total);
+    recalculateInvoiceTotals(db, req.params.id);
+    res.json({ success: true, id: info.lastInsertRowid });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/invoices/:id/items/:itemId', invoiceLimiter, (req, res) => {
+  try {
+    const { description, quantity, unit_price } = req.body;
+    const total = (quantity || 1) * (unit_price || 0);
+    db.prepare('UPDATE invoice_items SET description = ?, quantity = ?, unit_price = ?, total = ? WHERE id = ? AND invoice_id = ?').run(description, quantity || 1, unit_price || 0, total, req.params.itemId, req.params.id);
+    recalculateInvoiceTotals(db, req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/invoices/:id/items/:itemId', invoiceLimiter, (req, res) => {
+  try {
+    db.prepare('DELETE FROM invoice_items WHERE id = ? AND invoice_id = ?').run(req.params.itemId, req.params.id);
+    recalculateInvoiceTotals(db, req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create invoice from appointment
+app.post('/api/invoices/from-appointment/:appointmentId', invoiceLimiter, (req, res) => {
+  try {
+    const appointment = db.prepare(`
+      SELECT a.*, c.name as customer_name
+      FROM appointments a JOIN customers c ON a.customer_id = c.id
+      WHERE a.id = ?
+    `).get(req.params.appointmentId);
+    if (!appointment) return res.status(404).json({ error: 'Appointment not found' });
+    const invoiceNumber = generateInvoiceNumber(db);
+    const info = db.prepare(
+      // columns: invoice_number, customer_id, appointment_id, tax_rate, deposit_amount, amount_paid, notes
+      'INSERT INTO invoices (invoice_number, customer_id, appointment_id, tax_rate, deposit_amount, amount_paid, notes) VALUES (?, ?, ?, 0, 0, 0, ?)'
+    ).run(invoiceNumber, appointment.customer_id, appointment.id, `Invoice for appointment with ${appointment.artist_name}`);
+    const invoiceId = info.lastInsertRowid;
+    // Add a default line item for the appointment
+    db.prepare('INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total) VALUES (?, ?, 1, 0, 0)').run(
+      invoiceId, `Tattoo appointment with ${appointment.artist_name} (${new Date(appointment.appointment_date).toLocaleDateString()})`
+    );
+    recalculateInvoiceTotals(db, invoiceId);
+    res.json({ success: true, id: invoiceId, invoice_number: invoiceNumber });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
