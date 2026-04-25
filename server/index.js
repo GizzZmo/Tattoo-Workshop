@@ -769,6 +769,68 @@ app.post('/api/invoices/from-appointment/:appointmentId', invoiceLimiter, (req, 
   }
 });
 
+// Analytics API
+const analyticsLimiter = RateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60,
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+app.get('/api/analytics', analyticsLimiter, (req, res) => {
+  try {
+    const totalRevenue = db.prepare(
+      "SELECT COALESCE(SUM(amount_paid), 0) as total FROM invoices WHERE status IN ('paid', 'partial')"
+    ).get();
+
+    const outstandingBalance = db.prepare(
+      "SELECT COALESCE(SUM(total - amount_paid), 0) as total FROM invoices WHERE status NOT IN ('paid', 'cancelled')"
+    ).get();
+
+    const appointmentStats = db.prepare(
+      "SELECT status, COUNT(*) as count FROM appointments GROUP BY status"
+    ).all();
+
+    const monthlyRevenue = db.prepare(`
+      SELECT strftime('%Y-%m', created_at) as month,
+             COALESCE(SUM(amount_paid), 0) as revenue
+      FROM invoices
+      WHERE status IN ('paid', 'partial')
+      GROUP BY month
+      ORDER BY month DESC
+      LIMIT 6
+    `).all();
+
+    const topServices = db.prepare(`
+      SELECT ii.description, SUM(ii.total) as total, COUNT(*) as count
+      FROM invoice_items ii
+      JOIN invoices i ON ii.invoice_id = i.id
+      WHERE i.status IN ('paid', 'partial')
+      GROUP BY ii.description
+      ORDER BY total DESC
+      LIMIT 5
+    `).all();
+
+    const recentAppointments = db.prepare(`
+      SELECT a.appointment_date, a.status, a.artist_name, c.name as customer_name
+      FROM appointments a
+      JOIN customers c ON a.customer_id = c.id
+      ORDER BY a.appointment_date DESC
+      LIMIT 5
+    `).all();
+
+    res.json({
+      totalRevenue: totalRevenue.total,
+      outstandingBalance: outstandingBalance.total,
+      appointmentStats,
+      monthlyRevenue,
+      topServices,
+      recentAppointments,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

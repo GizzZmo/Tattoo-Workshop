@@ -13,6 +13,9 @@ The current version includes:
 - ✅ Portfolio Gallery
 - ✅ Settings Management
 - ✅ Secure Local Storage
+- ✅ Email Notifications for Appointments
+- ✅ Invoice Generation and Management
+- ✅ Analytics Dashboard (revenue, appointment stats, monthly revenue, top services)
 
 ---
 
@@ -46,6 +49,25 @@ See [EMAIL-NOTIFICATIONS.md](EMAIL-NOTIFICATIONS.md) for complete setup and usag
 - ✅ Improve customer experience with timely communication
 - ✅ Save time on manual appointment confirmations
 - ✅ Professional communication workflow
+
+---
+
+### 📊 Analytics Dashboard
+**Priority:** High  
+**Complexity:** Low-Medium  
+**Status:** ✅ COMPLETED
+
+**Description:**
+Built-in analytics dashboard providing key business insights directly on the home screen.
+
+**Implemented Features:**
+- ✅ KPI stat cards (customers, appointments, portfolio items, services, invoices, total revenue)
+- ✅ Appointment status breakdown (scheduled / completed / cancelled with percentages)
+- ✅ Monthly revenue bar chart (CSS-based, last 6 months)
+- ✅ Top services by revenue
+- ✅ Recent appointments feed with status badges
+- ✅ Outstanding balance tracking
+- ✅ `/api/analytics` endpoint
 
 ---
 
@@ -669,11 +691,10 @@ Have ideas for new features or improvements? We welcome your input!
 - ✅ Enhanced security features
 - Employee scheduling and time tracking
 
-### Phase 2: Communication & Documentation (Q2-Q3 2025)
-- Email notifications
-- SMS notifications
-- Invoice generation
-- Reporting and analytics
+### Phase 2: Communication & Documentation (Q2-Q3 2025) ✅ COMPLETED
+- ✅ Email notifications
+- ✅ Invoice generation
+- ✅ Analytics dashboard (integrated into Phase 2 scope)
 
 ### Phase 3: Integration & Automation (Q3-Q4 2025)
 - Payment processor integration
@@ -701,6 +722,6 @@ Have ideas for new features or improvements? We welcome your input!
 
 ---
 
-*Last Updated: 2025*
+*Last Updated: 2026*
 
 For questions or suggestions about the roadmap, please open an issue on GitHub.

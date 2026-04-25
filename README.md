@@ -3,8 +3,23 @@
 [![CI/CD Pipeline](https://github.com/GizzZmo/Tattoo-Workshop/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/GizzZmo/Tattoo-Workshop/actions/workflows/ci-cd.yml)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue)](package.json)
 
-A comprehensive studio management suite for tattoo artists and studios, featuring AI-powered design generation, customer management, appointment scheduling, and more.
+A comprehensive studio management suite for tattoo artists and studios, featuring AI-powered design generation, customer management, appointment scheduling, invoicing, and more.
+
+## Screenshots 📸
+
+| Dashboard | Customers | Appointments |
+|-----------|-----------|--------------|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Customers](docs/screenshots/customers.png) | ![Appointments](docs/screenshots/appointments.png) |
+
+| Pricelist | Portfolio | Invoices |
+|-----------|-----------|----------|
+| ![Pricelist](docs/screenshots/pricelist.png) | ![Portfolio](docs/screenshots/portfolio.png) | ![Invoices](docs/screenshots/invoices.png) |
+
+| AI Generator | Settings | Login |
+|--------------|----------|-------|
+| ![AI Generator](docs/screenshots/ai-generator.png) | ![Settings](docs/screenshots/settings.png) | ![Login](docs/screenshots/login.png) |
 
 ## Features ✨
 
@@ -16,6 +31,8 @@ A comprehensive studio management suite for tattoo artists and studios, featurin
 - **📧 Email Notifications**: Automated appointment confirmations, reminders, and updates
 - **💰 Dynamic Pricelist**: Manage services with categories, pricing, and duration estimates
 - **🖼️ Portfolio Gallery**: Showcase your work with images, descriptions, and tags
+- **🧾 Invoice Management**: Professional invoices with line items, tax, and payment tracking
+- **📊 Analytics Dashboard**: Revenue summary, appointment stats, monthly revenue, and top services
 - **⚙️ Settings Management**: Configure API keys and application preferences
 - **🔒 Secure Local Storage**: All data stored locally using SQLite database
 
@@ -120,6 +137,14 @@ The dashboard provides an overview of your studio statistics and quick access to
 - Tag pieces with relevant keywords
 - Organize and showcase your best work
 
+### Invoices
+- Create professional invoices linked to customers and appointments
+- Add line items with quantity and unit pricing
+- Apply tax rates and track deposits
+- Track payment status (pending, partial, paid, cancelled)
+- Mark invoices as paid with one click
+- Print / save as PDF via browser print dialog
+
 ### AI Tattoo Generator
 - Enter detailed descriptions of tattoo ideas
 - Receive professional design recommendations
@@ -145,23 +170,45 @@ Tattoo-Workshop/
 ├── .github/
 │   └── workflows/
 │       └── ci-cd.yml          # GitHub Actions workflow
+├── docs/
+│   └── screenshots/           # Application screenshots
 ├── public/
 │   └── tattoo-icon.svg        # Application icon
 ├── server/
+│   ├── auth/
+│   │   ├── middleware.js      # Auth middleware
+│   │   ├── routes.js          # Auth routes (login, register, profile)
+│   │   └── utils.js           # Auth utilities (hashing, JWT)
+│   ├── email/
+│   │   ├── service.js         # Email sending service
+│   │   ├── scheduler.js       # Email reminder scheduler
+│   │   └── templates.js       # Email templates
+│   ├── migrations/            # Database migrations
 │   └── index.js               # Express server and API routes
 ├── src/
+│   ├── components/
+│   │   ├── ImageCapture.jsx   # Camera/image capture component
+│   │   └── ProtectedRoute.jsx # Auth-protected route wrapper
+│   ├── contexts/
+│   │   └── AuthContext.jsx    # Authentication context
 │   ├── pages/
-│   │   ├── Dashboard.jsx      # Main dashboard
+│   │   ├── Dashboard.jsx      # Analytics dashboard
 │   │   ├── Customers.jsx      # Customer management
 │   │   ├── Appointments.jsx   # Appointment scheduling
 │   │   ├── Pricelist.jsx      # Service pricing
 │   │   ├── Portfolio.jsx      # Portfolio gallery
 │   │   ├── TattooGenerator.jsx # AI generator
+│   │   ├── Invoices.jsx       # Invoice management
+│   │   ├── Profile.jsx        # User profile
+│   │   ├── UserManagement.jsx # Admin user management
 │   │   └── Settings.jsx       # Settings page
 │   ├── styles/
 │   │   └── App.css           # Global styles
 │   ├── App.jsx               # Main app component
 │   └── main.jsx              # Entry point
+├── scripts/
+│   └── seed-data.js          # Database seeding script
+├── dist/                     # Production build artifacts (generated)
 ├── .eslintrc.cjs             # ESLint configuration
 ├── .gitignore                # Git ignore rules
 ├── index.html                # HTML template
@@ -228,12 +275,15 @@ For issues, questions, or suggestions:
 
 Future enhancements planned:
 - ✅ Email notifications for appointments (COMPLETED)
-- Invoice generation
+- ✅ Invoice generation (COMPLETED)
+- ✅ Analytics dashboard (COMPLETED)
 - Cloud backup integration
 - Mobile app version
 - Advanced reporting and analytics
 - Integration with payment processors
 - Booking widget for website integration
+- SMS notifications
+- Multi-language support
 
 For detailed information about each planned feature, including priorities, technical considerations, and benefits, see [ROADMAP.md](ROADMAP.md).
 

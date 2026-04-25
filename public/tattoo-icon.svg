@@ -1,7 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="45" fill="#646cff"/>
-  <path d="M 50 20 L 55 40 L 50 30 L 45 40 Z" fill="white"/>
-  <path d="M 50 35 L 50 80" stroke="white" stroke-width="3" fill="none"/>
-  <circle cx="50" cy="85" r="3" fill="white"/>
-  <text x="50" y="95" font-family="Arial" font-size="10" fill="white" text-anchor="middle">TATTOO</text>
+  <!-- Background circle -->
+  <defs>
+    <radialGradient id="bgGrad" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" style="stop-color:#7c85ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3a3fd4;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="needleGrad" cx="50%" cy="0%" r="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ccccff;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="47" fill="url(#bgGrad)" />
+  <circle cx="50" cy="50" r="47" fill="none" stroke="#9fa8ff" stroke-width="1.5" />
+
+  <!-- Tattoo machine body -->
+  <rect x="38" y="22" width="24" height="30" rx="5" ry="5" fill="#e8e8ff" />
+  <rect x="41" y="25" width="18" height="8" rx="2" ry="2" fill="#646cff" />
+  <circle cx="50" cy="45" r="4" fill="#646cff" />
+  <circle cx="50" cy="45" r="2" fill="#ffffff" />
+
+  <!-- Needle tip -->
+  <path d="M 47 52 L 50 68 L 53 52 Z" fill="url(#needleGrad)" />
+
+  <!-- Ink drop -->
+  <ellipse cx="50" cy="72" rx="3" ry="4" fill="#646cff" opacity="0.7" />
+  <ellipse cx="50" cy="74" rx="1.5" ry="1" fill="#9fa8ff" opacity="0.5" />
+
+  <!-- Decorative stars / sparkles -->
+  <circle cx="26" cy="34" r="1.5" fill="white" opacity="0.8" />
+  <circle cx="74" cy="30" r="1" fill="white" opacity="0.6" />
+  <circle cx="22" cy="62" r="1" fill="white" opacity="0.5" />
+  <circle cx="78" cy="58" r="1.5" fill="white" opacity="0.7" />
+
+  <!-- Small rose / decorative flourish on left -->
+  <path d="M 28 70 Q 25 65 30 63 Q 28 68 33 67 Q 29 72 28 70 Z" fill="#ff8fa3" opacity="0.85" />
+  <path d="M 28 70 Q 30 74 34 72" stroke="#ff8fa3" stroke-width="1.2" fill="none" opacity="0.7" />
 </svg>
