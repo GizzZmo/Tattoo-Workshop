@@ -16,6 +16,7 @@ Start here if you're new to Tattoo Workshop:
    - Quick installation guide
    - Basic usage instructions
    - Tech stack information
+   - **📸 Screenshots of every page**
 
 2. **[ABOUT.md](ABOUT.md)** - Project overview and philosophy
    - Mission and vision
@@ -99,8 +100,11 @@ Start here if you're new to Tattoo Workshop:
 - [Feature Overview](README.md#features-)
 - [AI Generator Setup](README.md#configuration-️)
 - [Email Notifications](EMAIL-NOTIFICATIONS.md)
+- [Invoice Management](README.md#invoices)
+- [Analytics Dashboard](README.md#dashboard)
 - [Usage Guide](README.md#usage-guide-)
 - [Future Roadmap](ROADMAP.md)
+- [Screenshots](docs/screenshots/)
 
 **Development**
 - [API Reference](API.md)
@@ -184,6 +188,6 @@ Found an error or want to improve the docs?
 
 ---
 
-**Last Updated**: 2025-10-14
+**Last Updated**: 2026-04-25
 
 *Documentation is maintained by the Tattoo Workshop team and contributors*

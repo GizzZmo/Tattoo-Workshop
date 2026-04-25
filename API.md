@@ -6,6 +6,37 @@ Development: `http://localhost:3001/api`
 
 ## Endpoints
 
+### Analytics
+
+#### Get Analytics Summary
+```
+GET /api/analytics
+```
+
+**Response:**
+```json
+{
+  "totalRevenue": 465.00,
+  "outstandingBalance": 80.00,
+  "appointmentStats": [
+    { "status": "scheduled", "count": 2 },
+    { "status": "completed", "count": 1 },
+    { "status": "cancelled", "count": 1 }
+  ],
+  "monthlyRevenue": [
+    { "month": "2026-04", "revenue": 465.00 }
+  ],
+  "topServices": [
+    { "description": "Traditional Sleeve - Session 1", "total": 300.00, "count": 1 }
+  ],
+  "recentAppointments": [
+    { "appointment_date": "2026-05-01T10:00:00", "status": "scheduled", "artist_name": "Jane Artist", "customer_name": "Alice Johnson" }
+  ]
+}
+```
+
+---
+
 ### Settings
 
 #### Get Setting

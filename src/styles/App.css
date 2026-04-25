@@ -233,6 +233,53 @@ tr:hover {
   overflow-x: auto;
 }
 
+/* Dashboard stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+  border: 1px solid #3a3a5c;
+  border-radius: 10px;
+  padding: 1.2rem;
+  text-align: center;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: #646cff;
+}
+
+.stat-emoji {
+  font-size: 1.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-sub {
+  font-size: 0.75rem;
+  color: #f0ad4e;
+  margin-top: 0.2rem;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -249,5 +296,9 @@ tr:hover {
   
   th, td {
     padding: 0.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   }
 }
