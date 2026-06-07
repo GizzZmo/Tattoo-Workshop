@@ -10,6 +10,7 @@ import EmailService from './email/service.js';
 import EmailScheduler from './email/scheduler.js';
 import { initializeTemplates } from './email/templates.js';
 import RateLimit from 'express-rate-limit';
+import bcrypt from 'bcryptjs';
 const __filename = fileURLToPath(import.meta.url);
 
 // Rate limiter for sensitive admin/config routes
@@ -159,6 +160,29 @@ db.exec(`
     FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
   );
 `);
+
+function ensureDefaultAdminUser() {
+  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
+
+  if (userCount.count > 0) {
+    return;
+  }
+
+  const defaultPassword = 'Admin123';
+  const passwordHash = bcrypt.hashSync(defaultPassword, 10);
+
+  const stmt = db.prepare(`
+    INSERT INTO users (name, email, password_hash, role, status)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  stmt.run('Admin User', 'admin@tattoo-workshop.local', passwordHash, 'admin', 'active');
+  console.log('✅ Default admin user created');
+  console.log('   Email: admin@tattoo-workshop.local');
+  console.log('   Password: Admin123');
+}
+
+ensureDefaultAdminUser();
 
 // Setup authentication routes
 setupAuthRoutes(app, db);
